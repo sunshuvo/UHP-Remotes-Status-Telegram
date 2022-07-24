@@ -1,0 +1,123 @@
+import os
+import time
+import requests
+import json
+
+
+# ######################################
+# Define Telegram API
+# ######################################
+def telegram_bot_sendtext(bot_message):
+    bot_token = '5569298395:AAEgcrtuSQMI4RjOBziJ_YIuLcrNCyqu9nE'
+    #bot_chatID = '@BackdoorSOC'
+    bot_chatID = '-1001748350066'
+    send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
+    response = requests.get(send_text)
+    return response.json()
+
+
+# ######################################
+# Collecting Active NMS
+# ######################################
+def nms_status(ip):
+    url="http://"+ip+"/jsonapi/?token=3RzM2jnm7s32wKOtXm9pLGQhdLhCxwkpaWx9tQMvjjfIWhzkNf2u94U9ZKig2h0K"
+
+    data = {
+        "object": "system",
+        "action": "core",
+        "params": {"cmd": "status"}
+    }
+    resp = requests.post(url, json=data)
+
+    return resp.json()['result']['redundancy_role']
+
+
+nms_1 = nms_status('192.168.168.162')
+if nms_1 == "master":
+    nms_master = '192.168.168.162'
+
+nms_2 = nms_status('192.168.168.161')
+if nms_2 == "master":
+    nms_master = '192.168.168.161'
+
+nms_3 = nms_status('192.168.168.160')
+if nms_3 == "master":
+    nms_master = '192.168.168.160'
+#print(nms_master)
+
+
+# ######################################
+# Define Ping  Function
+# ######################################
+def check_ping(hostname):
+    response = os.system("ping -n 2 " + hostname)
+    #time.sleep(3.0)
+    # and then check the response...
+    if response == 0:
+        pingstatus = 1
+    else:
+        pingstatus = 0
+
+    return pingstatus
+
+
+# ######################################
+# Define UHP API
+# ######################################
+def uhpapi(section,action,id):
+    url="http://"+nms_master+"/jsonapi/?token=3RzM2jnm7s32wKOtXm9pLGQhdLhCxwkpaWx9tQMvjjfIWhzkNf2u94U9ZKig2h0K"
+	
+    data = {
+        "object": section,
+        "action": action,
+        "id": id
+    }
+    resp = requests.post(url, json=data)
+
+    return resp.json()
+
+def uhpapi_condition(section,con1,val1,con2,val2):
+    url="http://"+nms_master+"/jsonapi/?token=3RzM2jnm7s32wKOtXm9pLGQhdLhCxwkpaWx9tQMvjjfIWhzkNf2u94U9ZKig2h0K"
+	
+    data = {
+        "object": section,
+        "action": "search",
+        "conditions": {
+            con1: val1,
+            con2: val2,
+            "private": "false"
+        }
+    }
+    resp = requests.post(url, json=data)
+
+    return resp.json()
+
+
+# ######################################
+# Collecting Remote Modems information
+# ######################################
+modem_list = uhpapi("station", "list", "")
+modem_array = []
+for remotes in modem_list['data']:
+    remote_ip = uhpapi_condition("stationroute", "station_id", remotes['id'], "type", "3")['data'][0]['addr']
+    remote_state = int(uhpapi("remotestate","select", remotes['id'])['data']['core_state'])
+    if(remote_state!=1):
+        ping_status = check_ping(remote_ip)
+        modem_array.append([remotes['id'], remotes['name'], remote_ip, remote_state, ping_status])
+
+#print(modem_array)
+
+# ######################################
+# Testing each modem
+# ######################################
+for test in modem_array:
+    name = test[1]
+    state = test[3]
+    ping_status = test[4]
+
+
+    if(state==7 and ping_status==0):
+        telegram_bot_sendtext("Unreachable but UP: " + name)
+
+    if(state==5):
+        telegram_bot_sendtext("Down: "+ name)
