@@ -8,9 +8,9 @@ import json
 # Define Telegram API
 # ######################################
 def telegram_bot_sendtext(bot_message):
-    bot_token = '5569298395:AAEgcrtuSQMI4RjOBziJ_YIuLcrNCyqu9nE'
-    #bot_chatID = '@BackdoorSOC'
-    bot_chatID = '-1001748350066'
+    bot_token = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    #bot_chatID = 'xxxxxxxxxxxxxxxxxxxx'
+    bot_chatID = 'xxxxxxxxxxxxxxxx'
     send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
     response = requests.get(send_text)
     return response.json()
