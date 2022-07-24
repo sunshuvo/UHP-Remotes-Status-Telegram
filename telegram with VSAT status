@@ -20,7 +20,7 @@ def telegram_bot_sendtext(bot_message):
 # Collecting Active NMS
 # ######################################
 def nms_status(ip):
-    url="http://"+ip+"/jsonapi/?token=3RzM2jnm7s32wKOtXm9pLGQhdLhCxwkpaWx9tQMvjjfIWhzkNf2u94U9ZKig2h0K"
+    url="http://"+ip+"/jsonapi/?token=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
     data = {
         "object": "system",
@@ -65,7 +65,7 @@ def check_ping(hostname):
 # Define UHP API
 # ######################################
 def uhpapi(section,action,id):
-    url="http://"+nms_master+"/jsonapi/?token=3RzM2jnm7s32wKOtXm9pLGQhdLhCxwkpaWx9tQMvjjfIWhzkNf2u94U9ZKig2h0K"
+    url="http://"+nms_master+"/jsonapi/?token=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	
     data = {
         "object": section,
@@ -77,7 +77,7 @@ def uhpapi(section,action,id):
     return resp.json()
 
 def uhpapi_condition(section,con1,val1,con2,val2):
-    url="http://"+nms_master+"/jsonapi/?token=3RzM2jnm7s32wKOtXm9pLGQhdLhCxwkpaWx9tQMvjjfIWhzkNf2u94U9ZKig2h0K"
+    url="http://"+nms_master+"/jsonapi/?token=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	
     data = {
         "object": section,
